@@ -20,6 +20,7 @@ Using the dataset obtained from FSU's [Florida Climate Center](https://climatece
 library(tidyverse)
 library(lubridate)
 library(ggridges)
+library(plotly)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
@@ -114,33 +115,51 @@ knitr::include_graphics("../figures/tpa_max_temps_ridges_plasma.png")
 ```
 
 ```{r, message=FALSE, warning=FALSE}
-ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = month_name)) +
-  geom_density_ridges(quantile_lines = TRUE, quantiles = 2, alpha = 0.7) +
-  scale_fill_viridis_d(option = "plasma") +
-  labs(
-    title = "Ridgeline Plot of Maximum Temperatures by Month",
-    x = "Maximum Temperature (°F)",
-    y = "Month",
-    fill = "Month"
-  ) +
+ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = stat(x))) +
+  geom_density_ridges_gradient(quantile_lines = TRUE, quantiles = 2, alpha = 0.7) +
+  scale_fill_viridis_c(option = "plasma", 
+                       breaks = c(40, 60, 80, 100),
+                       labels = c("40", "60", "80", "100")) +
+  guides(fill = guide_colorbar(
+    barwidth = unit(0.5, "cm"),
+    barheight = unit(3.5, "cm"))) + 
+  labs(title = "Ridgeline Plot of Maximum Temperatures by Month", 
+       x = "Maximum Temperature (°F)",
+       fill = NULL) +
   theme_ridges() + 
-  theme(legend.position = "none")
+  theme(plot.title = element_text(hjust = 0.5, size = 14),
+        panel.grid.major = element_line(color = "lightgray"), 
+        panel.grid.minor = element_line(color = "lightgray"), 
+        axis.title.x = element_text(hjust = 0.5, size = 12),
+        axis.title.y = element_blank(),
+        axis.text = element_text(color = "grey30", size = 10))
 ```
-
-Hint: use the`{ggridges}` package, and the `geom_density_ridges()` function paying close attention to the `quantile_lines` and `quantiles` parameters. The plot above uses the `plasma` option (color scale) for the _viridis_ palette.
 
 (e) Create a plot of your choice that uses the attribute for precipitation _(values of -99.9 for temperature or -99.99 for precipitation represent missing data)_.
 
 ```{r, message=FALSE, warning=FALSE}
-ggplot(tpa_clean, aes(x = doy, y = precipitation)) +
+plot <- ggplot(tpa_clean, aes(x = doy, y = precipitation)) +
   geom_line(color = "blue", alpha = 0.6) +
-  geom_smooth(color = "darkblue", method = "loess") +
-  labs(
-    title = "Daily Precipitation Trends in Tampa (2022)",
-    x = "Date",
-    y = "Precipitation (inches)"
-  ) +
-  theme_minimal()
+  geom_smooth(color = "darkblue", method = "loess", name = "Trend") +
+  labs(title = "Daily Precipitation Trends in Tampa From January 1 2022 to January 1 2023",
+       y = "Precipitation (inches)") +
+  theme(plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"), 
+        panel.grid.major = element_line(color = "lightgray"), 
+        panel.grid.minor = element_line(color = "lightgray"), 
+        axis.title.y = element_text(vjust = 3),
+        axis.title.x = element_blank())
+
+interactive_plot <- ggplotly(plot, tooltip = c("x", "y"))
+interactive_plot$x$data[[2]]$hoverinfo <- "none"
+interactive_plot$x$data[[3]]$hoverinfo <- "none"
+
+interactive_plot <- interactive_plot %>%
+  layout(xaxis = list(rangeslider = list(type = "date"), 
+                      rangeselector = list(buttons = list(list(count = 1, label = "1m", step = "month", stepmode = "backward"), 
+                                                          list(count = 3, label = "3m", step = "month", stepmode = "backward"), 
+                                                          list(step = "all", label = "All")))))
+interactive_plot
 ```
 
 ## PART 2 

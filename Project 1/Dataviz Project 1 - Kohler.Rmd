@@ -94,8 +94,9 @@ us_births_monthly_avg <- us_births_00_14 %>%
 ```
 
 ```{r, message = FALSE, warning = FALSE, fig.alt="Static column chart representing the normalized average daily U.S. births by month from 2000 to 2014. The x-axis lists the twelve months, and the y-axis tracks the daily average rate while accounting for calendar day bias. The bars show that the earlier months of January and February have lower numbers for average daily births, whereas an increase is seen in the summer month of August and September."}
-ggplot(us_births_monthly_avg, aes(x = factor(month, labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-                                                               "Sep", "Oct", "Nov", "Dec")), y = avg_daily_births)) +
+monthly_birth_plot <-  ggplot(us_births_monthly_avg, aes(x = factor(month, labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                                                                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")),
+                                                                 y = avg_daily_births)) +
   geom_col(fill = "blue", width = 0.7) +
   scale_y_continuous(labels = comma) +
   labs(title = "Average Daily U.S. Births By Month (2000 - 2014)",
@@ -104,6 +105,14 @@ ggplot(us_births_monthly_avg, aes(x = factor(month, labels = c("Jan", "Feb", "Ma
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"),
         axis.title.x = element_blank())
+
+monthly_birth_plot
+
+ggsave(filename = "../figures/monthly_birth_distribution.png", 
+       plot = monthly_birth_plot, 
+       width = 8, 
+       height = 5, 
+       dpi = 300)
 ```
 
 **Discussion:** Though this normalized column chart looks somewhat similar to the original, it resolves the calendar limitations of the original aggregated plot by transitioning from displaying raw monthly sums to showing a true daily average distribution rate. This was done by calculating the mean number of births per day within each specific month, ensuring that every month is properly evaluated. February is no longer penalized for its shorter 28-day length, and 31-day months are stripped of their artificial advantage. Now, this visualization confirms that even when accounting for day counts, an increase in average daily births still takes place during the late summer, clearly peaking in August and September.

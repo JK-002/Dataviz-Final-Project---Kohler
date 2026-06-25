@@ -199,7 +199,7 @@ ggplot(tpa_clean, aes(x = max_temp, fill = month_name)) +
 ### Improved Version (After Redesign)
 
 ```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=7, fig.alt="A horizontal hybrid visualization displaying monthly maximum temperature (°F) distributions for 2022. Twelve sequentially stacked violin plots illustrate the density curves for each month horizontally, while nested white boxplots mark the median and IQR. The layout captures wide, flat winter distributions transitioning into tight, high-temperature summer distributions near the mid 90s."}
-ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = month_name)) +
+violin_boxplot <- ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = month_name)) +
   geom_violin(alpha = 0.5, color = "black", scale = "width") +
   geom_boxplot(width = 0.15, fill = "white", color = "black", outlier.shape = NA, alpha = 0.8) +
   scale_fill_viridis_d(option = "viridis") +
@@ -214,6 +214,14 @@ ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = month_name)) +
        axis.text = element_text(size = 10),
        axis.title.y = element_blank(),
        legend.position = "none")
+
+violin_boxplot
+
+ggsave(filename = "../figures/tpa_monthly_violin_boxplot.png", 
+       plot = violin_boxplot, 
+       width = 6, 
+       height = 7, 
+       dpi = 300)
 ```
 
 **Discussion:** This horizontal hybrid violin-boxplot resolves the data occlusion of the overlapping plot by separating all twelve months sequentially along the vertical axis. The horizontal layout provides a clean progression that allows for immediate tracking of the changing temperatures throughout 2022. The violin geometries successfully preserve the unique density distributions of each month, revealing volatile, wide temperature spans in the winter months of January and February, shifting toward narrow distributions centered around the mid 90s during the peak summer months of July and August. Additionally, the nested boxplots cleanly show the median and quartile values for each month without leading to visual clutter.

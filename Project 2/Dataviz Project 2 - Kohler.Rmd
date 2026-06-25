@@ -130,7 +130,7 @@ ggplot(data = fl_map_data) +
 ### Improved Version (After Redesign)
 
 ```{r, message = FALSE, warning = FALSE, fig.alt="An improved spatial visualization of Florida private education that showcases the percentage of total schools that are private in 2017 per county as well as the private school locations in each county. Counties that are colored a dark purple indicate a higher percentage of private schools, whereas counties that are brighter orange-yellow tones represent lower percentages. The specific location of all private schools are identified with cyan points through the state and its counties. Higher densities of these points are located primarily in major urban areas like cities and along the coastline, where more rural areas have little to no cyan points indicating far fewer private institutions."}
-ggplot() +
+florida_private_schools <-  ggplot() +
   geom_sf(data = fl_map_data, aes(fill = Private_Percent), color = "white", linewidth = 0.15) +
   geom_sf(data = fl_private_points, color = "cyan", alpha = 0.4, size = 0.6) +
   scale_fill_viridis_c(option = "inferno", direction = -1, na.value = "darkgrey",
@@ -149,6 +149,14 @@ theme(plot.title = element_text(face = "bold", size = 15),
       axis.text = element_blank(), 
       axis.title = element_blank(), 
       legend.position = "right")
+
+florida_private_schools
+
+ggsave(filename = "../figures/florida_private_schools.png", 
+       plot = florida_private_schools, 
+       width = 8, 
+       height = 7, 
+       dpi = 300)
 ```
 
 **Discussion:** This improved spatial visualization, though somewhat similar, provides extra geographic precision as it now locates where all the private school facilities are located and gathered throughout the entire state of Florida and its counties. By plotting the actual latitudinal and longitudinal location of each private school directly over its the shaded county it resides, this choropleth now reveals that private schools are heavily clustered within specific urban city centers and high-density coastal areas while leaving the interior rural areas of those same counties almost entirely empty. This helps to provide more insight into where private schooling facilities are actually found throughout the state of Florida, not just what counties they can be found in, but what types of areas they primarily exist. Therefore, resolving the issue of geographic precision that the original visualization faced.

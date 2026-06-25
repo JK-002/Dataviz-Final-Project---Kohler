@@ -64,7 +64,7 @@ ggplot(tpa_clean, aes(x = max_temp)) +
         legend.position = "none")
 ```
 
->*This faceted histogram displays the maximum monthly temperatures (°F) experienced throughout 2022 as well as the number of days each temperature was reached. The winter months of December, January, and February display a broader range of temperatures ranging from the yearly lows of the mid 40s to the mid 80s. Conversely, the summer months of June, July, and August, unlike the winter months exhibit a much tighter range of temperatures and also feature yearly temperature high's in the mid to high 90s.*
+>*This faceted histogram displays the maximum monthly temperatures (°F) experienced throughout 2022 as well as the number of days each temperature was reached. The winter months of December, January, and February display a broader range of temperatures ranging from the yearly lows of the mid 40s to the mid 80s. Conversely, the summer months of June, July, and August, unlike the winter months, exhibit a much tighter range of temperatures and also feature yearly temperature highs in the mid to high 90s.*
 
 (b) Create a plot like the one below:
 
@@ -112,7 +112,7 @@ ggplot(tpa_clean, aes(x = max_temp)) +
         legend.position = "none")
 ```
 
->*In this faceted density plot, a clear contrast between monthly temperature (°F) volatility can be seen. In the summer months of July and August, tall and narrow density curves can be seen which indicates low temperature variance. However, for the winter months of December, January, and February, wider and flatter curves can be seen showcasing the data-to-day temperature variability that is seen during the cooler months.*
+>*In this faceted density plot, a clear contrast between monthly temperature (°F) volatility can be seen. In the summer months of July and August, tall and narrow density curves can be seen which indicates low temperature variance. However, for the winter months of December, January, and February, wider and flatter curves can be seen showcasing the day-to-day temperature variability that is seen during the cooler months.*
 
 (d) Generate a plot like the chart below:
 
@@ -120,7 +120,7 @@ ggplot(tpa_clean, aes(x = max_temp)) +
 knitr::include_graphics("../figures/tpa_max_temps_ridges_plasma.png") 
 ```
 
-```{r, message=FALSE, warning=FALSE, fig.alt="A ridgeline plot organizing maximum temperatures (°F) chronologically by month. The ridges physically shift to the right and transition from deep blue to bright yellow as the temperature increase into the summer months. They then begin to move bakc left as temperature begin to decrease towards the end of fall and into winter."}
+```{r, message=FALSE, warning=FALSE, fig.alt="A ridgeline plot organizing maximum temperatures (°F) chronologically by month. The ridges physically shift to the right and transition from deep blue to bright yellow as the temperatures increase into the summer months. They then begin to move back left as temperatures begin to decrease towards the end of fall and into winter."}
 ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = stat(x))) +
   geom_density_ridges_gradient(quantile_lines = TRUE, quantiles = 2, alpha = 0.7) +
   scale_fill_viridis_c(option = "plasma", breaks = c(40, 60, 80, 100),
@@ -144,7 +144,7 @@ ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = stat(x))) +
 
 (e) Create a plot of your choice that uses the attribute for precipitation _(values of -99.9 for temperature or -99.99 for precipitation represent missing data)_.
 
-```{r, message=FALSE, warning=FALSE, fig.alt="An interactive time-series line plot tracking daily precipitation in Tampa. It features a prominent rainfall spike during indicating that the rainy season takes place during the summer months as well as the beginning of the fall season. This supported by a dark blue smoothing line highlighting whihc also emphasizes the summer rainy season."}
+```{r, message=FALSE, warning=FALSE, fig.alt="An interactive time-series line plot tracking daily precipitation in Tampa. It features a prominent rainfall spike during indicating that the rainy season takes place during the summer months as well as the beginning of the fall season. This is supported by a dark blue smoothing line, which also emphasizes the summer rainy season."}
 plot <- ggplot(tpa_clean, aes(x = doy, y = precipitation)) +
   geom_line(color = "blue", alpha = 0.6) +
   geom_smooth(color = "darkblue", method = "loess", name = "Trend") +
@@ -220,7 +220,8 @@ ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = month_name)) +
 
 ## PART 2 
 
-> **You can choose to work on either Option (A) or Option (B)**. Remove from this template the option you decided not to work on. 
+> **You can choose to work on either Option (A) or Option (B)**. Remove from this template the option you decided not to work on.
+
 ### Option (B): Data on Concrete Strength 
 
 Concrete is the most important material in **civil engineering**. The concrete compressive strength is a highly nonlinear function of _age_ and _ingredients_. The dataset used here is from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php), and it contains 1030 observations with 9 different attributes 9 (8 quantitative input variables, and 1 quantitative output variable). A data dictionary is included below: 
@@ -266,7 +267,7 @@ ggplot(new_concrete, aes(x = Cement)) +
         panel.grid.minor = element_line(color = "lightgray"))
 ```
 
-**Cement Content Ranges & Distribution:** The cement content shown in the above histogram ranges roughly from a little less than $100 \text{ kg/m}^3$ to over $500 \text{ kg/m}^3$, and after some [research](https://pennarrmc.com/grades-of-concrete/), this range does of values does indeed make sense. Concrete mixtures depending on the grade, were found to range roughly from $170 \text{ kg/m}^3$ on the lower end up to $510 \text{ kg/m}^3$on the high end. Now, there are three main categories of concrete mixtures which exist, those being *ordinary concrete*, *standard concrete*, and *high-strength concrete*. Each of these three main categories of concrete mixtures have different grades which fall into their respective categories depending on the mechanical properties of each grade. *Ordinary concrete* and *standard concrete* are the most common and they tend to see mixtures with cement content under $400 \text{ kg/m}^3$, whereas *high-strength concrete* is less common and typically sees mixtures with cement content over $400 \text{ kg/m}^3$. When taking this into account, the range of values found above does make complete sense as most of the data points are found to be under $400 \text{ kg/m}^3$ falling into the categories of either *ordinary concrete* or *standard concrete* which are more commonly used, while less data points are over $400 \text{ kg/m}^3$ and fall into the category of *high-strength concrete* which is less commonly utilized.
+**Cement Content Ranges & Distribution:** The cement content shown in the above histogram ranges roughly from a little less than $100 \text{ kg/m}^3$ to over $500 \text{ kg/m}^3$, and after some [research](https://pennarrmc.com/grades-of-concrete/), this range does of values does indeed make sense. Concrete mixtures depending on the grade, were found to range roughly from $170 \text{ kg/m}^3$ on the lower end up to $510 \text{ kg/m}^3$on the high end. Now, there are three main categories of concrete mixtures which exist, those being *ordinary concrete*, *standard concrete*, and *high-strength concrete*. Each of these three main categories has different grades which fall into their respective categories depending on their mechanical properties. *Ordinary concrete* and *standard concrete* are the most common and they tend to see mixtures with cement content under $400 \text{ kg/m}^3$, whereas *high-strength concrete* is less common and typically sees mixtures with cement content over $400 \text{ kg/m}^3$. When taking this into account, the range of values found above does make complete sense as most of the data points are found to be under $400 \text{ kg/m}^3$ falling into the categories of either *ordinary concrete* or *standard concrete* which are more commonly used, while less data points are over $400 \text{ kg/m}^3$ and fall into the category of *high-strength concrete* which is less commonly utilized.
 
 ```{r, message=FALSE, warning=FALSE, fig.alt="A histogram displaying the distribution of water content in the concrete mixtures. The distribution spans from approximately 120 kg/m³ to 250 kg/m³, with the vast majority of the samples clustering tightly between 160 kg/m³ and 200 kg/m³."}
 ggplot(new_concrete, aes(x = Water)) +
@@ -280,7 +281,7 @@ ggplot(new_concrete, aes(x = Water)) +
         panel.grid.minor = element_line(color = "lightgray"))
 ```
 
-**Water Content Ranges & Distribution:** The water content shown in this histogram ranges from approximately $120 \text{ kg/m}^3$ to nearly $250 \text{ kg/m}^3$. This range is realistic as the typical water to cement ratio typically lies between [0.3 to 0.8](https://concretecountertopinstitute.com/free-training/the-importance-of-water-cement-ratio-in-concrete-countertop-mix-design/). Now, having a higher water to cement ratio will lead to a weaker and more brittle concrete mixture, while having a lower water to cement ratio will lead to a stronger mixture, with a ratio of 0.6 - 0.7 being the average. When taking into account that the majority of data points for cement fell between $160 \text{ kg/m}^3$ and $400 \text{ kg/m}^3$, the respective range for water should fall being $115 \text{ kg/m}^3$ and $240 \text{ kg/m}^3$. This is almost what the data exactly reflects, therefore, verifying that the range is indeed realistic.
+**Water Content Ranges & Distribution:** The water content shown in this histogram ranges from approximately $120 \text{ kg/m}^3$ to nearly $250 \text{ kg/m}^3$. This range is realistic as the typical water to cement ratio typically lies between [0.3 to 0.8](https://concretecountertopinstitute.com/free-training/the-importance-of-water-cement-ratio-in-concrete-countertop-mix-design/). Now, having a higher water to cement ratio will lead to a weaker and more brittle concrete mixture, while having a lower water to cement ratio will lead to a stronger mixture, with a ratio of 0.6 - 0.7 being the average. When taking into account that the majority of data points for cement fell between $160 \text{ kg/m}^3$ and $400 \text{ kg/m}^3$, the respective range for water should fall between $115 \text{ kg/m}^3$ and $240 \text{ kg/m}^3$. This is almost what the data exactly reflects, therefore, verifying that the range is indeed realistic.
 
 2. Use a _temporal_ indicator such as the one available in the variable `Age` (measured in days). Generate a plot similar to the one shown below. Comment on your results.
 
@@ -301,7 +302,7 @@ ggplot(new_concrete, aes(x = as.factor(Age), y = Concrete_compressive_strength, 
         legend.position = "right")
 ```
 
-**Discussion:** This boxplot data visualization showcases `Concrete_compressive_strength` across various `age` milestones while being segmented by the calculated `strength_range` quantiles. Early on, a trend showing an increase in the compressive strength can seen as the strength range transitions from the just the including the (dark purple, 2.33 – 21 MPa) range to include the (dark blue, 21 – 30.9 MPa) range, then the (teal, 30.9 – 39 MPa) range, etc. as the aging process goes on. However, at 28 days, this trend seems to end alongside the presence of the lowest strength range (dark purple, 2.33 – 21 MPa) which completely disappears as the aging process continues. As for the highest peak compressive strengths, they are heavily concentrated around the 91-day mark. Though, once past 90 days, primarily from 180 to 365 days, the distribution stabilizes, and fewer high-strength outliers are observed.
+**Discussion:** This boxplot data visualization showcases `Concrete_compressive_strength` across various `age` milestones while being segmented by the calculated `strength_range` quantiles. Early on, a trend showing an increase in the compressive strength can be seen as the strength range transitions from just including the (dark purple, 2.33 – 21 MPa) range to include the (dark blue, 21 – 30.9 MPa) range, then the (teal, 30.9 – 39 MPa) range, etc. as the aging process goes on. However, at 28 days, this trend seems to end alongside the presence of the lowest strength range (dark purple, 2.33 – 21 MPa) which completely disappears as the aging process continues. As for the highest peak compressive strengths, they are heavily concentrated around the 91-day mark. Though, once past 90 days, primarily from 180 to 365 days, the distribution stabilizes, and fewer high-strength outliers are observed.
 
 3. Create a scatterplot similar to the one shown below. Pay special attention to which variables are being mapped to specific aesthetics of the plot. Comment on your results. 
 

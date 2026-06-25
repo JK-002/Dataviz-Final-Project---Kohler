@@ -216,7 +216,7 @@ ggplot(tpa_clean, aes(x = max_temp, y = month_name, fill = month_name)) +
        legend.position = "none")
 ```
 
-**Discussion:** This horizontal hybrid violin-boxplot resolves the data occlusion of the overlapping plot by separating all twelve months sequentially along the vertical axis. The horizontal layout provides a clean progression that allows for immediate tracking of the changing temperatures throughout 2022. The violin geometries successfully preserve the unique density distributions of each month, revealing volatile, wide temperature spans in the winter months of January and February, shifting toward narrow distributions centered around the mid 90s during the peak summer months of July and August. Additionally, the nested boxplots cleanly show the median and quartile values for each month without leading to visual clutter.*
+**Discussion:** This horizontal hybrid violin-boxplot resolves the data occlusion of the overlapping plot by separating all twelve months sequentially along the vertical axis. The horizontal layout provides a clean progression that allows for immediate tracking of the changing temperatures throughout 2022. The violin geometries successfully preserve the unique density distributions of each month, revealing volatile, wide temperature spans in the winter months of January and February, shifting toward narrow distributions centered around the mid 90s during the peak summer months of July and August. Additionally, the nested boxplots cleanly show the median and quartile values for each month without leading to visual clutter.
 
 ## PART 2 
 

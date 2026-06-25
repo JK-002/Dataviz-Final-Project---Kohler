@@ -1,5 +1,6 @@
 ---
 title: "Mini-Project 1 Revised"
+author: "Justin Kohler `jkohler0835@floridapoly.edu`"
 output: 
   html_document:
     keep_md: true
@@ -9,4 +10,110 @@ output:
 
 # Data Visualization Project 1
 
-_revised version of mini-project 01 goes here_
+## Introduction
+
+This report analyzes data surrounding births in the United States from the years 2000 to 2014. Through the utilization of RStudio and its `tidyverse` package, three unique data visualizations were produced utilizing this U.S. birth data. These visualizations help to provide insight into various birth trends within the United States during this 15 year window which can play an important role in future domestic policy decisions.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(scales)
+```
+
+```{r, message = FALSE, warning = FALSE}
+us_births_00_14 <- read_csv("../data/us_births_00_14.csv")
+glimpse(us_births_00_14)
+```
+> _The data shown above acts as a way to glimpse the variables within this US births from 2000 to 2014 data set. This helps with determining what data visualizations can be created from these variables and this set of data._
+
+## Chart Selection
+
+Now, after glimpsing this US birth data, there were two specific data visualizations which immediately came to mind. The first of these two data visualization would be looking at total US births per year while the second data visualization would be looking at the total aggregated births for each month of the year. These two data visualization ideas are not dense with data and to keep their simplicity, a line chart and bar chart were selected respectively as the chart types. As for the third data visualization, it took a bit longer to come up with, but it's looking at the average number of daily births per day of the month. This third data visualization was also not too dense with data and therefore a line chart was selected as the respective chart type. Though all these data visualizations show different relationships between the data and provide different insights, some of the relationships and insights are much more useful then others in the stories that they tell consequently making them more helpful in discerning birth trends.
+
+## Annual US Birth Trends (2000 - 2014)
+
+In this first section, the long-term trajectory of births in the U.S. is examined. All of the birth data for each year was displayed as total number of births which allowed for the observation of the national birth rate trends. 
+
+```{r}
+us_births_annually <- us_births_00_14 %>%
+  group_by(year) %>%
+  summarize(total_births = sum(births))
+```
+
+```{r}
+ggplot(data = us_births_annually, aes(x = year, y = total_births)) +
+  geom_line(color = "skyblue", size = 1) +
+  geom_point(color = "skyblue", size = 3) +
+  scale_x_continuous(breaks = 2000:2014) +
+  scale_y_continuous(labels = comma) + 
+  labs(title = "Total U.S. Births Per Year (2000-2014)",
+       x = "Year",
+       y = "Total Births") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_blank())
+```
+
+> _This first figure showcases the total number of births within the United States for each individual year during a 15 year span ranging from 2000 to 2014. In the early to mid - 2000's, a increase in births can be seen which peaks in 2007 with over 4.3 million births. Then, beginning in 2008 alongside the Great Recession, a sharp decrease can be seen which lasts until 2014. This demonstrates how economic conditions broadly speaking can influence whether families within a country plan on and end up having children._
+
+## Bad Chart Redesign: Monthly US Birth Distirbution (2000 - 2014)
+
+### Original Version (Before Redesign)
+
+As for this second section, to isolate seasonal birth trends, all the data for the 15 year range of 2000 to 2014 was aggregated by month. This allows for the clear visualization of which seasons see higher or lower total birth counts. 
+
+```{r}
+us_births_monthly <- us_births_00_14 %>%
+  group_by(month) %>%
+  summarize(total_births = sum(births)) %>%
+  mutate(month_name = factor(month.abb[month], levels = month.abb))
+```
+
+```{r}
+ggplot(data = us_births_monthly, aes(x = month_name, y = total_births)) + 
+  geom_col(fill = "skyblue", width = 0.7) +
+  scale_y_continuous(limits = c(0, 6000000), labels = comma) + 
+  labs(title = "Total U.S. Births By Month (2000 - 2014)",
+       x = "Month",
+       y = "Total Births") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.title.x = element_blank())
+```
+
+**Discussion:** .
+
+> _This second figure showcases notable seasonality in birth trends. Total aggregated births peak in the late summer and early fall during the specific months of July, August, and September with August being the peak month. However, a decrease in births is seen in late fall which reaches its low in the month of Feburary. This low is likely due to Feburary having a shorter calendar length of 28 or 29 days depending on whether its a leap year or not._
+
+### Improved Version (After Redesign)
+
+
+
+## Average Daily US Birth Distribution by Day of the Month
+
+Finally, in this third section, the average daily births across the days of each month (1 - 31) were observed. This was done by tracking the average number of births for each day of each month for each year to look for outliers or trends.
+
+```{r}
+us_births_day_of_month <- us_births_00_14 %>%
+  group_by(date_of_month) %>%
+  summarize(average_births = mean(births))
+```
+
+```{r}
+ggplot(data = us_births_day_of_month, aes(x = date_of_month, y = average_births)) + 
+  geom_line(color = "skyblue3", size = 1) +
+  geom_point(color = "skyblue3", size = 2) +
+  scale_x_continuous(breaks = 1:31) +
+  scale_y_continuous(labels = comma) + # Keeps zoomed-in layout for detail
+  labs(title = "Average U.S. Births by Day of the Month (2000-2014)",
+       x = "Day of the Month",
+       y = "Average Births") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+```
+
+> _This third figure displays a high consistency between the number of average daily births with the minimum being slightly less than 11,000 and the maximum being slightly less than 11,600. While there are a few days which can be considered outliers, such as the 25th and the 31st, they are not extreme in the degree to which they vary. Though the 25th doesn't seem to have any explanation for its decrease in average daily births, the decrease for the 31st can be reasonably explained. This decline on the 31st is likely because only 7 of 12 months include a 31st day, hence why the decrease average daily births occurs._
+
+## Discussion
+
+In summary, two of the three data visualizations created from the U.S. birth data over the 15 year period of 2000 to 2014 help to clearly display birth trends within the U.S. The first figure helps to show that domestic factors such as economic sensitivity can and do influence the birth rate within the United States. When the economy is doing well or is perceived to be doing well, birth rates tend to increase. The opposite is also true as shown by the decrease in total births during the years following the 2008 Great Recession. As for the second figure, it showcases understandable seasonality in birth volume. Towards the end of the summer and in the beginning of the fall, an increase in births occurs with the peak birth volume occurring in August. Whereas towards the end of the fall and into the winter, a decline in birth volume is seen with the low occurring in February which makes sense due to it having less total days. This seasonal trend remains consistent throughout the years that this data set covers. Finally, in the third figure, the data displays a high consistency in average daily births no matter the day of the month. This is shown by the range of average daily births being very low in comparison to the mean of average daily births with both sitting at values of approximately 600 and 11200 respectively. Though some days of the month such as the 25th and the 31st could be considered outliers, they are not extreme in the degree to which they vary. In the case of the 31st, the decline in average daily births is likely due to only 7 of 12 months including a 31st day, hence the decline. Now, all of these data visualizations were made while keeping a few data visualization principles in mind with the first and foremost principle being to avoid unnecessary chart junk. Chart junk can turn what could be a simple and easily readable figure into an ugly mess that is more difficult for an audience to interpret. This leads to confusion and works against the data being presented. Another data visualization principle utilized in the creation of these figures was color. The blue bars and points help with drawing attention to the data rather than the having everything somewhat mundane black and white chart. Lastly, the two gestalt principles of proximity and continuity were utilized in the creation of these data visualizations. The principle of continuity was used with the line charts to connect all the individual data points together which helps to show how the data is not discrete in nature, but continuous and connected. The principle of proximity was applied with the bar chart by ensuring that the bars for each month were adjusted to have more space between them. This helps in distinguishing the bars to show that they are not a unified group of data and instead 12 distinct metrics. Without utilizing these data visualization principles, these figures would likely be less effective in displaying the data relationships that they do as well as conveying the insights that were found.

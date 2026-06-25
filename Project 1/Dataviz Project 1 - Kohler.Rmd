@@ -17,6 +17,7 @@ This report analyzes data surrounding births in the United States from the years
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(scales)
+library(plotly)
 ```
 
 ```{r, message = FALSE, warning = FALSE}
@@ -27,19 +28,19 @@ glimpse(us_births_00_14)
 
 ## Chart Selection
 
-Now, after glimpsing this US birth data, there were two specific data visualizations which immediately came to mind. The first of these two data visualization would be looking at total US births per year while the second data visualization would be looking at the total aggregated births for each month of the year. These two data visualization ideas are not dense with data and to keep their simplicity, a line chart and bar chart were selected respectively as the chart types. As for the third data visualization, it took a bit longer to come up with, but it's looking at the average number of daily births per day of the month. This third data visualization was also not too dense with data and therefore a line chart was selected as the respective chart type. Though all these data visualizations show different relationships between the data and provide different insights, some of the relationships and insights are much more useful then others in the stories that they tell consequently making them more helpful in discerning birth trends.
+Now, after glimpsing this US birth data, there were two specific data visualizations which immediately came to mind. The first of these two data visualizations would be looking at total US births per year while the second would look at US birth distribution by month. For the first data visualization, a line chart was selected because line charts excel at displaying time related trends while keeping their simplicity. In the case of the second data visualization, a bar chart was selected because bar charts are good for comparing discrete groups of data against one another, which would be good for comparing month to month birth distribution. Finally, after deciding on the third and final data visualization idea, which was to look at average daily US births by day of the week, a bar chart was once again selected. This was for the same aforementioned reason that bar charts excel at comparing discrete groups of data to one another. Therefore, it would be perfect for comparing the average US births for each day of the week.
 
 ## Annual US Birth Trends (2000 - 2014)
 
 In this first section, the long-term trajectory of births in the U.S. is examined. All of the birth data for each year was displayed as total number of births which allowed for the observation of the national birth rate trends. 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 us_births_annually <- us_births_00_14 %>%
   group_by(year) %>%
   summarize(total_births = sum(births))
 ```
 
-```{r}
+```{r, message = FALSE, warning = FALSE, fig.alt="Line chart showing total U.S. births per year from 2000 to 2014. The x-axis lists individual years with 45-degree rotated labels, and the y-axis shows total births. The visualization displays a increase in births from 2000 until a peak of over 4.3 million births in 2007, followed by a dramatic drop through 2014."}
 ggplot(data = us_births_annually, aes(x = year, y = total_births)) +
   geom_line(color = "skyblue", size = 1) +
   geom_point(color = "skyblue", size = 3) +
@@ -54,22 +55,20 @@ ggplot(data = us_births_annually, aes(x = year, y = total_births)) +
         axis.title.x = element_blank())
 ```
 
-> _This first figure showcases the total number of births within the United States for each individual year during a 15 year span ranging from 2000 to 2014. In the early to mid - 2000's, a increase in births can be seen which peaks in 2007 with over 4.3 million births. Then, beginning in 2008 alongside the Great Recession, a sharp decrease can be seen which lasts until 2014. This demonstrates how economic conditions broadly speaking can influence whether families within a country plan on and end up having children._
+> _This first figure showcases the total number of births within the United States for each individual year during a 15 year span ranging from 2000 to 2014. In the early to mid - 2000's, an increase in births can be seen which peaks in 2007 with over 4.3 million births. Then, beginning in 2008 alongside the Great Recession, a sharp decrease can be seen which lasts until 2014. This demonstrates how economic conditions could be considered as one of many influential factors which can influence whether families within a country plan on and end up having children._
 
-## Bad Chart Redesign: Monthly US Birth Distirbution (2000 - 2014)
+## Bad Chart Redesign: Monthly US Birth Distribution (2000 - 2014)
 
 ### Original Version (Before Redesign)
 
-As for this second section, to isolate seasonal birth trends, all the data for the 15 year range of 2000 to 2014 was aggregated by month. This allows for the clear visualization of which seasons see higher or lower total birth counts. 
-
-```{r}
+```{r, message = FALSE, warning = FALSE}
 us_births_monthly <- us_births_00_14 %>%
   group_by(month) %>%
   summarize(total_births = sum(births)) %>%
   mutate(month_name = factor(month.abb[month], levels = month.abb))
 ```
 
-```{r}
+```{r, message = FALSE, warning = FALSE, fig.alt="Static column chart representing total aggregated U.S. births by month from 2000 to 2014. The x-axis lists the twelve months from January to December, and the y-axis displays un-normalized total birth counts starting at a baseline of zero. The bars visually imply a late-summer surge but don't account for calendar day bias by directly comparing months with unequal day counts."}
 ggplot(data = us_births_monthly, aes(x = month_name, y = total_births)) + 
   geom_col(fill = "skyblue", width = 0.7) +
   scale_y_continuous(limits = c(0, 6000000), labels = comma) + 
@@ -81,39 +80,93 @@ ggplot(data = us_births_monthly, aes(x = month_name, y = total_births)) +
         axis.title.x = element_blank())
 ```
 
-**Discussion:** .
-
-> _This second figure showcases notable seasonality in birth trends. Total aggregated births peak in the late summer and early fall during the specific months of July, August, and September with August being the peak month. However, a decrease in births is seen in late fall which reaches its low in the month of Feburary. This low is likely due to Feburary having a shorter calendar length of 28 or 29 days depending on whether its a leap year or not._
+**Discussion:** While this original column chart successfully identifies a general trend which showcases that higher total birth volumes occur in the late summer and early autumn, it has a big flaw. This flaw is calendar day bias. Aggregating raw birth counts strictly by calendar month introduces distortion because each month does not contain an equal number of days. A perfect example of this can be seen by comparing a 28-day February directly against a 31-day March. February is penalized by missing three full days of data collection. Conversely, longer months with 31 days (March, May, July, etc.) receive an artificial boost in births, rather than seeing an actual increase in birth rates.
 
 ### Improved Version (After Redesign)
 
-
-
-## Average Daily US Birth Distribution by Day of the Month
-
-Finally, in this third section, the average daily births across the days of each month (1 - 31) were observed. This was done by tracking the average number of births for each day of each month for each year to look for outliers or trends.
-
-```{r}
-us_births_day_of_month <- us_births_00_14 %>%
-  group_by(date_of_month) %>%
-  summarize(average_births = mean(births))
+```{r, message = FALSE, warning = FALSE}
+us_births_monthly_avg <- us_births_00_14 %>%
+  group_by(year, month) %>%
+  summarize(total_births = sum(births),
+            days_in_month = n(), .groups = "drop") %>%
+  group_by(month) %>%
+  summarize(avg_daily_births = sum(total_births) / sum(days_in_month))
 ```
 
-```{r}
-ggplot(data = us_births_day_of_month, aes(x = date_of_month, y = average_births)) + 
-  geom_line(color = "skyblue3", size = 1) +
-  geom_point(color = "skyblue3", size = 2) +
-  scale_x_continuous(breaks = 1:31) +
-  scale_y_continuous(labels = comma) + # Keeps zoomed-in layout for detail
-  labs(title = "Average U.S. Births by Day of the Month (2000-2014)",
-       x = "Day of the Month",
-       y = "Average Births") +
+```{r, message = FALSE, warning = FALSE, fig.alt="Static column chart representing the normalized average daily U.S. births by month from 2000 to 2014. The x-axis lists the twelve months, and the y-axis tracks the daily average rate while accounting for calendar day bias. The bars show that the earlier months of January and February have lower numbers for average daily birhts, whereas an increase is seen in the summer month of August and September."}
+ggplot(us_births_monthly_avg, aes(x = factor(month, labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+                                                               "Sep", "Oct", "Nov", "Dec")), y = avg_daily_births)) +
+  geom_col(fill = "skyblue", width = 0.7) +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Average Daily U.S. Births By Month (2000 - 2014)",
+       x = "Month",
+       y = "Average Daily Births") +
   theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.title.x = element_blank())
 ```
 
-> _This third figure displays a high consistency between the number of average daily births with the minimum being slightly less than 11,000 and the maximum being slightly less than 11,600. While there are a few days which can be considered outliers, such as the 25th and the 31st, they are not extreme in the degree to which they vary. Though the 25th doesn't seem to have any explanation for its decrease in average daily births, the decrease for the 31st can be reasonably explained. This decline on the 31st is likely because only 7 of 12 months include a 31st day, hence why the decrease average daily births occurs._
+**Discussion:** Though this normalized column chart looks somewhat similar to the original, it resolves the calendar limitations of the original aggregated plot by transitioning from displaying raw monthly sums to showing a true daily average distribution rate. This was done by calculating the mean number of births per day within each specific month, ensuring that every month is properly evaluated. February is no longer penalized for its shorter 28-day length, and 31-day months are stripped of their artificial advantage. Now, this visualization confirms that even when accounting for day counts, an increase in average daily births still takes place during the late summer, clearly peaking in August and September.
 
-## Discussion
+## Average US Births by Day of the Week (Interactive Plot)
 
-In summary, two of the three data visualizations created from the U.S. birth data over the 15 year period of 2000 to 2014 help to clearly display birth trends within the U.S. The first figure helps to show that domestic factors such as economic sensitivity can and do influence the birth rate within the United States. When the economy is doing well or is perceived to be doing well, birth rates tend to increase. The opposite is also true as shown by the decrease in total births during the years following the 2008 Great Recession. As for the second figure, it showcases understandable seasonality in birth volume. Towards the end of the summer and in the beginning of the fall, an increase in births occurs with the peak birth volume occurring in August. Whereas towards the end of the fall and into the winter, a decline in birth volume is seen with the low occurring in February which makes sense due to it having less total days. This seasonal trend remains consistent throughout the years that this data set covers. Finally, in the third figure, the data displays a high consistency in average daily births no matter the day of the month. This is shown by the range of average daily births being very low in comparison to the mean of average daily births with both sitting at values of approximately 600 and 11200 respectively. Though some days of the month such as the 25th and the 31st could be considered outliers, they are not extreme in the degree to which they vary. In the case of the 31st, the decline in average daily births is likely due to only 7 of 12 months including a 31st day, hence the decline. Now, all of these data visualizations were made while keeping a few data visualization principles in mind with the first and foremost principle being to avoid unnecessary chart junk. Chart junk can turn what could be a simple and easily readable figure into an ugly mess that is more difficult for an audience to interpret. This leads to confusion and works against the data being presented. Another data visualization principle utilized in the creation of these figures was color. The blue bars and points help with drawing attention to the data rather than the having everything somewhat mundane black and white chart. Lastly, the two gestalt principles of proximity and continuity were utilized in the creation of these data visualizations. The principle of continuity was used with the line charts to connect all the individual data points together which helps to show how the data is not discrete in nature, but continuous and connected. The principle of proximity was applied with the bar chart by ensuring that the bars for each month were adjusted to have more space between them. This helps in distinguishing the bars to show that they are not a unified group of data and instead 12 distinct metrics. Without utilizing these data visualization principles, these figures would likely be less effective in displaying the data relationships that they do as well as conveying the insights that were found.
+Finally, in this third section, the average daily births across the days of the week (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, & Sunday) were observed. This was done by tracking the average number of births for day of the week for each year to look for outliers or trends.
+
+```{r, message = FALSE, warning = FALSE}
+us_births_day_of_week <- us_births_00_14 %>%
+  group_by(year, day_of_week) %>%
+  summarize(yearly_daily_avg = mean(births, na.rm = TRUE), .groups = "drop") %>%
+  group_by(day_of_week) %>%
+summarize(
+    global_average = mean(yearly_daily_avg),
+    hover_text = paste0(
+      "<b>", unique(day_of_week), " Global Average: </b>", comma(round(global_average)), "<br>",
+      "<b>Yearly Variations:</b><br>",
+      paste0(
+        "2000: ", comma(round(yearly_daily_avg[year==2000])), 
+        " &nbsp;|&nbsp; 2005: ", comma(round(yearly_daily_avg[year==2005])), 
+        " &nbsp;|&nbsp; 2010: ", comma(round(yearly_daily_avg[year==2010])), 
+        "<br>",
+        "2001: ", comma(round(yearly_daily_avg[year==2001])), 
+        " &nbsp;|&nbsp; 2006: ", comma(round(yearly_daily_avg[year==2006])), 
+        " &nbsp;|&nbsp; 2011: ", comma(round(yearly_daily_avg[year==2011])), 
+        "<br>",
+        "2002: ", comma(round(yearly_daily_avg[year==2002])),
+        " &nbsp;|&nbsp; 2007: ", comma(round(yearly_daily_avg[year==2007])), 
+        " &nbsp;|&nbsp; 2012: ", comma(round(yearly_daily_avg[year==2012])), 
+        "<br>",
+        "2003: ", comma(round(yearly_daily_avg[year==2003])), 
+        " &nbsp;|&nbsp; 2008: ", comma(round(yearly_daily_avg[year==2008])),
+        " &nbsp;|&nbsp; 2013: ", comma(round(yearly_daily_avg[year==2013])), 
+        "<br>",
+        "2004: ", comma(round(yearly_daily_avg[year==2004])),
+        " &nbsp;|&nbsp; 2009: ", comma(round(yearly_daily_avg[year==2009])), 
+        " &nbsp;|&nbsp; 2014: ", comma(round(yearly_daily_avg[year==2014])))), 
+    .groups = "drop") %>%
+  mutate(day_of_week = factor(day_of_week, 
+                              levels = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"),
+                              labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+  arrange(day_of_week)
+```
+
+```{r, message = FALSE, warning = FALSE, fig.alt="Interactive column chart displaying the average number of daily U.S. births across the seven days of the week from 2000 to 2014. Weekdays from Monday through Friday show consistently elevated birth averages, while Saturdays and Sundays experience an rather notable drop in births down to approximately 7,500. This is possibly due to normal hospital scheduling for deliveries."}
+plot <- ggplot(data = us_births_day_of_week, aes(x = day_of_week, y = global_average, text = hover_text)) + 
+  geom_col(fill = "skyblue", width = 0.6) +
+  theme_classic(base_size = 12) +
+  scale_y_continuous(labels = scales::comma_format()) +
+  labs(title = "Average U.S. Births by Day of the Week (2000 - 2014)", 
+       x = "Day of the Week", 
+       y = "Average Daily Births") + 
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 15),
+        axis.title.x = element_blank())
+
+ggplotly(plot, tooltip = "text")
+```
+
+>*This third figure displays a clear distinction between the number of average daily births on weekdays versus weekends, with the maximum peaking at over 13,000 on Tuesdays and the minimum dropping to roughly 7,500 on Sundays. While the average birth rates remain fairly consistent throughout the work week (Monday through Friday), a sharp drop is encountered right when the weekend begins. Now, this weekend decline can possibly be explained due to many deliveries, especially ones that require medical assistance, being scheduled during the work week. This could account for the notable decrease in average daily births that take place during the weekend as less operations tend to be scheduled during both Saturday and Sunday. This plot is interactive. By dragging the cursor over each bar, the user can view the exact overall number of average births for that day of the week alongside the individual number of average births for that day of the week for each year.*
+
+**Interactive vs. Static Visualizations:** A static version of this chart successfully displays the differences between weekday and weekend births, but it doesn't show any other individual information throughout the individual years of this dataset. However, by making this chart interactive, this issue is resolved by allowing the user to hover over each bar for each day of the week to view extra information. The viewer can easily view the overall number of average births per day of the week, as well as see the individual averages for each of the fifteen years. Therefore, this interactive data visualization has the ability to display more data without cluttering the primary information that the chart is displaying, accomplishing something that would be much more difficult to pull off with a static data visualization.
+
+## General Discussion
+
+In summary, the three data visualizations created from the U.S. birth data over the 15-year period of 2000 to 2014 help to clearly display a few meaningful birth trends within the United States. The first figure demonstrates that factors such as the economy could be influential when it comes to national birth rates. When the economy is stable or growing, birth rates tend to increase as seen in the early to mid-2000s, however, as seen from after the birth peak in 2007, a notable decrease in total births can be seen indicating that economic downturn like that experience during the Great Recession could play a role when it comes to national births. As for the second figure, it showcases that even when accounting for calendar day bias, an increase in average daily births occurs during the late summer, peaking cleanly in August and September. In the case of the winter months like January and February, the opposite can be seen with a decrease in average daily births taking place. Finally, the third figure reveals an easily observable trend in daily birth distribution across the days of the week. While average daily birth rates remain consistently elevated above 13,000 during standard workdays, they experience a dramatic drop down to roughly 7,500 births on Saturdays and Sundays. This can possibly be explained by common medical scheduling practices where delivery procedures are more commonly scheduled during the week rather than on weekends, hence the notable increase in daily birth distribution during the work week and a decrease during the weekend. Now, all of these data visualizations were made while keeping a few data visualization principles in mind, with the first and foremost principle being to avoid unnecessary chart junk. Chart junk can turn what could be a simple and easily readable figure into an ugly mess that is more difficult for an audience to interpret, leading to confusion and working against the data being presented. By utilizing clean axes, clear labels, and minimalist themes, these figures allow the reader to focus entirely on the actual trends rather than visual distractions. Another data visualization principle utilized in the creation of these figures was color. The skyblue bars and points help draw immediate attention to the data points themselves without overwhelming the reader or being too bland, which could cause the audience's attention to be lost. Additionally, multiple Gestalt principles were intentionally applied across these visualizations. The principle of continuity was utilized in the line charts to connect individual years together sequentially, which visually emphasizes that continuous nature of the time related data. The Gestalt principle of proximity was also used in the bar charts to structurally separate individual monthly and weekly categories, ensuring that each column stands individually. In the third figure showcasing average US births by day of the week, proximity works to naturally group weekdays together at a high visual ceiling, while setting the weekend days distinctly lower. Lastly, the principle of interactivity was introduced to add increased utility to the third figure. It now allows the user to hover over individual columns to view more data that isn't shown on the static version of the chart. Therefore, this interactive data visualization now has the ability to display more data without cluttering the primary information that the chart is displaying, accomplishing something that would be much more difficult to pull off with a static data visualization. Without utilizing these core data visualization principles, these figures would likely be far less effective in displaying the underlying data relationships as well as conveying the real-world insights that were found.
